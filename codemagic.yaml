@@ -1,4 +1,3 @@
-yaml
 workflows:
   ios-unsigned:
     name: Rashodnik iOS Unsigned
