@@ -1,7 +1,7 @@
 workflows:
-  ios-workflow:
-    name: iOS Build Workflow
-    max_build_duration: 60
+  ios-release-ipa:
+    name: iOS Unsigned IPA
+    max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
       flutter: stable
@@ -13,11 +13,28 @@ workflows:
       branch_patterns:
         - pattern: 'main'
     scripts:
-      - name: Set up local.properties
-        script: echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
       - name: Get Flutter dependencies
-        script: flutter pub get
-      - name: Build iOS IPA without signing
-        script: flutter build ios --release --no-codesign
+        script: |
+          flutter pub get
+
+      - name: Build iOS IPA (Unsigned)
+        script: |
+          # Сборка приложения без требования сертификата разработчика Apple
+          flutter build ipa --release --no-codesign
+
+      - name: Package Application into IPA with Payload structure
+        script: |
+          # Создаём правильную структуру Payload/Runner.app для установки на устройство
+          cd build/ios/archive/Runner.xcarchive/Products/Applications
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r ../../../../../app-release.ipa Payload
+          cd ../../../../../
+          
+          # Проверяем наличие созданного файла
+          ls -la app-release.ipa
+
     artifacts:
-      - build/ios/iphoneos/*.app
+      - app-release.ipa
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/Runner.xcarchive
