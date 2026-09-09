@@ -1,3 +1,4 @@
+```yaml
 workflows:
   ios-unsigned:
     name: Rashodnik iOS Unsigned
@@ -11,19 +12,18 @@ workflows:
 
     scripts:
       - name: Get Flutter packages
-        script: flutter pub get
-
-      - name: Install CocoaPods
         script: |
-          cd ios
-          pod install
+          flutter pub get
 
-      - name: Flutter analyze
-        script: flutter analyze
+      - name: Generate iOS project
+        script: |
+          flutter create --platforms=ios .
 
-      - name: Build iOS without signing
-        script: flutter build ios --debug --no-codesign
+      - name: Build iOS without code signing
+        script: |
+          flutter build ios --debug --no-codesign
 
     artifacts:
       - build/ios/iphoneos/**/*.app
       - /tmp/xcodebuild_logs/*.log
+```
