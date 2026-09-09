@@ -907,30 +907,45 @@ class AccountWithBalance {
   String get color => account.color;
 }
 
+// ---------------------------------------------------------------------------
+// MONEY FORMAT
+// ---------------------------------------------------------------------------
+
+String _formatAmount(double value) {
+  // Сохраняем дробную часть до 3 знаков.
+  // Лишние нули после запятой/точки убираем.
+  String text = value.toStringAsFixed(3);
+
+  while (text.contains('.') && text.endsWith('0')) {
+    text = text.substring(0, text.length - 1);
+  }
+
+  if (text.endsWith('.')) {
+    text = text.substring(0, text.length - 1);
+  }
+
+  final parts = text.split('.');
+  final integerPart = parts[0];
+  final decimalPart = parts.length > 1 ? parts[1] : null;
+
+  final formattedInteger = integerPart.replaceAllMapped(
+    RegExp(r'\B(?=(\d{3})+(?!\d))'),
+    (match) => ' ',
+  );
+
+  if (decimalPart != null && decimalPart.isNotEmpty) {
+    return '$formattedInteger.$decimalPart';
+  }
+
+  return formattedInteger;
+}
+
 String formatMoney(double value) {
-  final rounded = value.round();
-
-  final text = rounded
-      .toString()
-      .replaceAllMapped(
-        RegExp(r'\B(?=(\d{3})+(?!\d))'),
-        (match) => ' ',
-      );
-
-  return '$text сомони';
+  return '${_formatAmount(value)} сомони';
 }
 
 String formatShortMoney(double value) {
-  final rounded = value.round();
-
-  final text = rounded
-      .toString()
-      .replaceAllMapped(
-        RegExp(r'\B(?=(\d{3})+(?!\d))'),
-        (match) => ' ',
-      );
-
-  return '$text с';
+  return '${_formatAmount(value)} с';
 }
 
 String formatDate(DateTime date) {
