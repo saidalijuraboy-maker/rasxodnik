@@ -17,24 +17,17 @@ workflows:
         script: |
           flutter pub get
 
-      - name: Build iOS IPA (Unsigned)
+      - name: Build iOS App
         script: |
-          # Сборка приложения без требования сертификата разработчика Apple
-          flutter build ipa --release --no-codesign
+          flutter build ios --release --no-codesign
 
-      - name: Package Application into IPA with Payload structure
+      - name: Create IPA directly on macOS
         script: |
-          # Создаём правильную структуру Payload/Runner.app для установки на устройство
-          cd build/ios/archive/Runner.xcarchive/Products/Applications
-          mkdir -p Payload
+          cd build/ios/iphoneos
+          mkdir Payload
           cp -r Runner.app Payload/
-          zip -r ../../../../../app-release.ipa Payload
-          cd ../../../../../
-          
-          # Проверяем наличие созданного файла
-          ls -la app-release.ipa
+          zip -r -9 app-release.ipa Payload
+          mv app-release.ipa $CM_BUILD_DIR/
 
     artifacts:
-      - app-release.ipa
-      - build/ios/ipa/*.ipa
-      - build/ios/archive/Runner.xcarchive
+      - "*.ipa"
