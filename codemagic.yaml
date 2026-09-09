@@ -1,4 +1,4 @@
-```yaml
+yaml
 workflows:
   ios-unsigned:
     name: Rashodnik iOS Unsigned
@@ -26,4 +26,3 @@ workflows:
     artifacts:
       - build/ios/iphoneos/**/*.app
       - /tmp/xcodebuild_logs/*.log
-```
